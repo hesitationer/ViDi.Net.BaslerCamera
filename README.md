@@ -1,0 +1,1 @@
+# ViDi.Net.BaslerCamera
