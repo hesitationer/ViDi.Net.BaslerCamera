@@ -57,6 +57,19 @@ namespace ViDi2.Camera
 
             camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
 
+              if (camera.GetSfncVersion() < Sfnc2_0_0)
+                {
+                    if (camera.Parameters[PLCamera.PixelFormat].CanSetValue(PLCamera.PixelFormat.RGB8))
+                        camera.Parameters[PLCamera.PixelFormat].CanSetValue(PLCamera.PixelFormat.RGB8);
+                }
+                else
+                {
+                    if (camera.Parameters[PLUsbCamera.PixelFormat].CanSetValue(PLUsbCamera.PixelFormat.RGB8))
+                        camera.Parameters[PLUsbCamera.PixelFormat].CanSetValue(PLUsbCamera.PixelFormat.RGB8);
+                }
+           
+            camera.Parameters[PLCamera.PixelCoding].SetValue(PLCamera.PixelCoding.RGB8);
+
             parameters = new List<ICameraParameter>
             {
                 new CameraParameter("Exposure Time", () => ExposureTime, (value) => ExposureTime = (double)value),
@@ -93,7 +106,7 @@ namespace ViDi2.Camera
                        break;
                    case PixelType.BGR8packed:
                         channels = 3;
-                        break;
+                        break;    
                    default:
                        throw new Exception(string.Format("pixel type not supported.", grabResult.PixelTypeValue.ToString()));
                }
