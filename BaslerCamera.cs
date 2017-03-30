@@ -1,10 +1,19 @@
-﻿using System;
+﻿//--------------------------------------------------------------------------------------------
+// ---- Updated for Basler usage via Bitmap for color and grayscale cameras
+// ---- Tested on: Mono8, BayerBG8, BayerBG12
+// ---- updated by: Ing. Jan Šimon CZ, MB
+// ---- NOTE!: you also need to rewrite CameraPanel for using bitmap on one place at the time
+//--------------------------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Basler.Pylon;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.ComponentModel;
+using System.Diagnostics;
+
 
 namespace ViDi2.Camera
 {
@@ -57,19 +66,6 @@ namespace ViDi2.Camera
 
             camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
 
-              if (camera.GetSfncVersion() < Sfnc2_0_0)
-                {
-                    if (camera.Parameters[PLCamera.PixelFormat].CanSetValue(PLCamera.PixelFormat.RGB8))
-                        camera.Parameters[PLCamera.PixelFormat].CanSetValue(PLCamera.PixelFormat.RGB8);
-                }
-                else
-                {
-                    if (camera.Parameters[PLUsbCamera.PixelFormat].CanSetValue(PLUsbCamera.PixelFormat.RGB8))
-                        camera.Parameters[PLUsbCamera.PixelFormat].CanSetValue(PLUsbCamera.PixelFormat.RGB8);
-                }
-           
-            camera.Parameters[PLCamera.PixelCoding].SetValue(PLCamera.PixelCoding.RGB8);
-
             parameters = new List<ICameraParameter>
             {
                 new CameraParameter("Exposure Time", () => ExposureTime, (value) => ExposureTime = (double)value),
@@ -78,17 +74,20 @@ namespace ViDi2.Camera
               //   new CameraParameter("AOI Offset", () => AOIOffset, (value) => AOIOffset = (Point)value),
               //  new CameraParameter("AOI Size", () => AOISize, (value) => AOISize = (Point)value),
               //  new CameraParameter("Pixel Clock", () => PixelClock, (value) => PixelClock = (int)value),
-              //  new CameraParameter("Managed Image", () => ManagedImages, (value) => ManagedImages = (bool)value),
+               // new CameraParameter("Managed Image", () => ManagedImages, (value) => ManagedImages = (bool)value)
             
             };
+            
+            
         }
-
-
+        
+        
+        
+        private Stopwatch stopWatch = new Stopwatch();
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
+        	
           try{
-                // Acquire the image from the camera. Only show the latest image. The camera may acquire images faster than the images can be displayed.
-                // Get the grab result.
                 IGrabResult grabResult = e.GrabResult;
                 if (!grabResult.GrabSucceeded)
                     throw new Exception("grab unsuccessful ????");
@@ -106,19 +105,50 @@ namespace ViDi2.Camera
                        break;
                    case PixelType.BGR8packed:
                         channels = 3;
-                        break;    
+                        break;
+                   case PixelType.BayerBG12:
+                        channels = 3;
+                        break;
+                   case PixelType.BayerBG8:
+                        channels = 3;
+                        break;
+                   case PixelType.YUV422_YUYV_Packed:
+                        channels = 3;
+                        break;
+                   case PixelType.BayerBG12p:
+                        channels = 3;
+                        break;   
+                   case PixelType.YUV422packed:
+                        channels = 3;
+                        break;                           
+                        
                    default:
                        throw new Exception(string.Format("pixel type not supported.", grabResult.PixelTypeValue.ToString()));
                }
+                  
+             if (grabResult.IsValid)
+             {
+             		PixelDataConverter converter = new PixelDataConverter();
+             		System.Drawing.Bitmap bitmap = new Bitmap(grabResult.Width, grabResult.Height, PixelFormat.Format32bppArgb);
+             		BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+             		
+             		converter.OutputPixelFormat = PixelType.BGRA8packed;
+              		IntPtr ptrBmp = bmpData.Scan0;
+              		converter.Convert(ptrBmp, bmpData.Stride * bitmap.Height, grabResult);
+              		 	
+             		bitmap.UnlockBits(bmpData);
+                    IImage imag = new FormsImage(bitmap);
 
-                byte[] data = grabResult.PixelData as byte[];
-
-                ByteImage img = new ByteImage(grabResult.Width, grabResult.Height,channels,depth,data,grabResult.Width+grabResult.PaddingX);
-
-                ImageGrabbed(this, img);
+                  	ImageGrabbed(this, imag);
+             
+             	 }
             }
+        	
+        	
+        	
             catch (Exception exception)
             {
+            	//ShowException(exception);
             }
             finally
             {
@@ -182,7 +212,7 @@ namespace ViDi2.Camera
             }
         }
 
-
+        
 
         public string Name
         {
@@ -205,6 +235,11 @@ namespace ViDi2.Camera
             camera.Close();
             RaisePropertyChanged("IsOpen");
 
+        }
+        
+        private void ShowException(Exception exception)
+        {
+        	throw new Exception("Karel: " + exception);
         }
 
         public bool IsGrabbingContinuous

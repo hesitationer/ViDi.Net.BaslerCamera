@@ -12,11 +12,19 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <SignAssembly>False</SignAssembly>
+    <DelaySign>False</DelaySign>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
     <OutputPath>.\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -30,36 +38,57 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Basler.Pylon, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files\Basler\pylon 5\Development\Assemblies\Basler.Pylon\x64\Basler.Pylon.dll</HintPath>
     </Reference>
     <Reference Include="ICamera">
-      <HintPath>..\ViDi.Net.ICamera\ICamera.dll</HintPath>
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\plugins\ICamera.dll</HintPath>
+    </Reference>
+    <Reference Include="PylonC.NET">
+      <HintPath>..\..\..\..\Program Files\Basler\pylon 5\Development\Assemblies\PylonC.Net\PylonC.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="ViDi.NET.Base, Version=2.0.7.3278, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
-      <HintPath>packages\ViDi.NET.UI.2.0.7.3278\lib\net451\ViDi.NET.Base.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ViDi.NET">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.dll</HintPath>
     </Reference>
-    <Reference Include="ViDi.NET.Interfaces, Version=2.0.7.3278, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
-      <HintPath>packages\ViDi.NET.UI.2.0.7.3278\lib\net451\ViDi.NET.Interfaces.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ViDi.NET.Base">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.Base.dll</HintPath>
     </Reference>
-    <Reference Include="ViDi.NET.UI, Version=2.0.7.3278, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
-      <HintPath>packages\ViDi.NET.UI.2.0.7.3278\lib\net451\ViDi.NET.UI.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ViDi.NET.Interfaces">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.Interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="ViDi.NET.UI.Interfaces, Version=2.0.7.3278, Culture=neutral, PublicKeyToken=af17e7056638eaaa, processorArchitecture=MSIL">
-      <HintPath>packages\ViDi.NET.UI.2.0.7.3278\lib\net451\ViDi.NET.UI.Interfaces.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ViDi.NET.Local">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.Local.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.Plugin.CameraPanel">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\plugins\ViDi.NET.Plugin.CameraPanel.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.UI">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="ViDi.NET.UI.Interfaces">
+      <HintPath>..\..\..\..\Program Files\ViDi Systems\ViDi Suite 20\ViDi.NET.UI.Interfaces.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -71,10 +100,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
